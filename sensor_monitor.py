@@ -1,8 +1,10 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import csv
 
 SEED = 42
+CSV_FILE = "sensor_readings.csv"
 
 def ask_float(prompt): # comma getal
     while True:
@@ -86,12 +88,24 @@ def plot_histogram(readings, sensor_type):
     plt.legend()
     plt.savefig("readings_histogram.png")
 
+def save_readings(readings, filename):
+    try:
+        with open(filename, "w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(["sample", "reading"])
+            for number, value in enumerate(readings, start=1):
+                writer.writerow([number, value])
+        print(f"\nReadings saved to {filename}")
+    except OSError as error:
+        print(f"\nError: could not save {filename}: {error}")
+
 def main():
     print("=== Sensor Data Analysis Tool ===")
     settings = get_input()
     readings = generate_readings(
         settings["count"], settings["min_value"], settings["max_value"]
     )
+    save_readings(readings, CSV_FILE)
 
     threshold = settings["threshold"]
     stats = calculate_statistics(readings, threshold)
