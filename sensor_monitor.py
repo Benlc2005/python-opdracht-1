@@ -49,14 +49,43 @@ def generate_readings(count, min_value, max_value):
         readings.append(round(value, 2))
     return np.array(readings)
 
+def calculate_statistics(readings, threshold):
+    return {
+        "count": len(readings),
+        "mean": np.mean(readings),
+        "min": np.min(readings),
+        "max": np.max(readings),
+        "std": np.std(readings),
+        "above": np.sum(readings > threshold),
+    }
+
+def find_outliers(readings, threshold):
+    return np.where(readings > threshold)[0]
+
 def main():
     print("=== Sensor Data Analysis Tool ===")
     settings = get_input()
     readings = generate_readings(
         settings["count"], settings["min_value"], settings["max_value"]
     )
-    print(readings)
+
+    threshold = settings["threshold"]
+    stats = calculate_statistics(readings, threshold)
+    outliers = find_outliers(readings, threshold)
+
+    print(f"\n--- Statistics for {settings['sensor_type']} ---")
+    print(f"Number of readings : {stats['count']}")
+    print(f"Mean               : {stats['mean']:.2f}")
+    print(f"Minimum            : {stats['min']:.2f}")
+    print(f"Maximum            : {stats['max']:.2f}")
+    print(f"Standard deviation : {stats['std']:.2f}")#getallen achter de komma
+    print(f"Above threshold    : {stats['above']}")
+
+    print("\nReadings above the threshold:")
+    for i in outliers:
+        print(f"  Sample {i + 1}: {readings[i]:.2f}")
 
 
 if __name__ == "__main__":
     main()
+
