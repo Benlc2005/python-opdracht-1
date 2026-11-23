@@ -1,5 +1,7 @@
 import random
 import numpy as np
+import matplotlib.pyplot as plt
+
 SEED = 42
 
 def ask_float(prompt): # comma getal
@@ -62,6 +64,28 @@ def calculate_statistics(readings, threshold):
 def find_outliers(readings, threshold):
     return np.where(readings > threshold)[0]
 
+def plot_readings(readings, threshold, sensor_type):
+    samples = range(1, len(readings) + 1)
+    plt.figure()
+    plt.plot(samples, readings, marker="o", label="Readings")
+    plt.axhline(y=threshold, color="red", linestyle="--", label="Threshold")
+    plt.title(f"{sensor_type} readings")
+    plt.xlabel("Sample number")
+    plt.ylabel("Value")
+    plt.grid(True)
+    plt.legend()
+    plt.savefig("readings_plot.png")
+
+def plot_histogram(readings, sensor_type):
+    plt.figure()
+    plt.hist(readings, bins=10, edgecolor="black", label="Readings")
+    plt.title(f"Distribution of {sensor_type} readings")
+    plt.xlabel("Value")
+    plt.ylabel("Frequency")
+    plt.grid(True)
+    plt.legend()
+    plt.savefig("readings_histogram.png")
+
 def main():
     print("=== Sensor Data Analysis Tool ===")
     settings = get_input()
@@ -84,6 +108,10 @@ def main():
     print("\nReadings above the threshold:")
     for i in outliers:
         print(f"  Sample {i + 1}: {readings[i]:.2f}")
+
+    plot_readings(readings, threshold, settings["sensor_type"])
+    plot_histogram(readings, settings["sensor_type"])
+    plt.show()
 
 
 if __name__ == "__main__":
