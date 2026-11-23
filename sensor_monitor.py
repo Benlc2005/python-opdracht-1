@@ -1,3 +1,7 @@
+import random
+import numpy as np
+SEED = 42
+
 def ask_float(prompt): # comma getal
     while True:
         text=input(prompt)
@@ -37,10 +41,21 @@ def get_input():
         "threshold": threshold
     }
     
+def generate_readings(count, min_value, max_value):
+    random.seed(SEED)
+    readings = []
+    for _ in range(count):
+        value = random.uniform(min_value, max_value)
+        readings.append(round(value, 2))
+    return np.array(readings)
+
 def main():
     print("=== Sensor Data Analysis Tool ===")
     settings = get_input()
-    print(settings)
+    readings = generate_readings(
+        settings["count"], settings["min_value"], settings["max_value"]
+    )
+    print(readings)
 
 
 if __name__ == "__main__":
