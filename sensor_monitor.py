@@ -99,19 +99,63 @@ def save_readings(readings, filename):
     except OSError as error:
         print(f"\nError: could not save {filename}: {error}")
 
+def ask_choice():
+    print("\n1) Generate new readings")
+    print("2) Load readings from a CSV file")
+    while True:
+        choice = input("Choose 1 or 2: ")
+        if choice in ("1", "2"):
+            return choice
+        print("Please enter 1 or 2.")
+
+def load_readings(filename):
+    try:
+        with open(filename, "r") as file:
+            reader = csv.reader(file)
+            next(reader)
+            readings = []
+            for row in reader:
+                readings.append(float(row[1]))
+    except FileNotFoundError:
+        print(f"Error: the file '{filename}' does not exist.")
+        return None
+    except (ValueError, IndexError):
+        print(f"Error: '{filename}' contains invalid data.")
+        return None
+
+    if len(readings) == 0:
+        print(f"Error: '{filename}' contains no readings.")
+        return None
+
+    print(f"Loaded {len(readings)} readings from {filename}")
+    return np.array(readings)
+
 def main():
     print("=== Sensor Data Analysis Tool ===")
-    settings = get_input()
-    readings = generate_readings(
-        settings["count"], settings["min_value"], settings["max_value"]
-    )
-    save_readings(readings, CSV_FILE)
+    choice = ask_choice()
 
-    threshold = settings["threshold"]
+    if choice == "1":
+        settings = get_input()
+        readings = generate_readings(
+            settings["count"], settings["min_value"], settings["max_value"]
+        )
+        save_readings(readings, CSV_FILE)
+        sensor_type = settings["sensor_type"]
+        threshold = settings["threshold"]
+    else:
+        filename = input(f"CSV file name (Enter = {CSV_FILE}): ")
+        if filename == "":
+            filename = CSV_FILE
+        readings = load_readings(filename)
+        if readings is None:
+            return
+        sensor_type = input("Sensor type (temperature, light): ")
+        threshold = ask_float("Threshold value: ")
+
     stats = calculate_statistics(readings, threshold)
     outliers = find_outliers(readings, threshold)
 
-    print(f"\n--- Statistics for {settings['sensor_type']} ---")
+    print(f"\n--- Statistics for {sensor_type} ---")
     print(f"Number of readings : {stats['count']}")
     print(f"Mean               : {stats['mean']:.2f}")
     print(f"Minimum            : {stats['min']:.2f}")
@@ -123,8 +167,8 @@ def main():
     for i in outliers:
         print(f"  Sample {i + 1}: {readings[i]:.2f}")
 
-    plot_readings(readings, threshold, settings["sensor_type"])
-    plot_histogram(readings, settings["sensor_type"])
+    plot_readings(readings, threshold, sensor_type)
+    plot_histogram(readings, sensor_type)
     plt.show()
 
 
