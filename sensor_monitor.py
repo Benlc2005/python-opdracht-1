@@ -27,7 +27,7 @@ def ask_int(prompt): #positief getal
             continue
         return value   
 
-def get_input():
+def get_input(): # user input vragen voor waardes
     sensor_type = input("sensor type (temperature, light): ")
     count = ask_int("Number of readings: ")
     while True:
@@ -45,7 +45,7 @@ def get_input():
         "threshold": threshold
     }
     
-def generate_readings(count, min_value, max_value):
+def generate_readings(count, min_value, max_value): # reading genereren
     random.seed(SEED)
     readings = []
     for _ in range(count):
@@ -53,7 +53,7 @@ def generate_readings(count, min_value, max_value):
         readings.append(round(value, 2))
     return np.array(readings)
 
-def calculate_statistics(readings, threshold):
+def calculate_statistics(readings, threshold): # statistieken berekenen
     return {
         "count": len(readings),
         "mean": np.mean(readings),
@@ -66,7 +66,7 @@ def calculate_statistics(readings, threshold):
 def find_outliers(readings, threshold):
     return np.where(readings > threshold)[0]
 
-def plot_readings(readings, threshold, sensor_type):
+def plot_readings(readings, threshold, sensor_type):#grafiek 1
     samples = range(1, len(readings) + 1)
     plt.figure()
     plt.plot(samples, readings, marker="o", label="Readings")
@@ -78,7 +78,7 @@ def plot_readings(readings, threshold, sensor_type):
     plt.legend()
     plt.savefig("readings_plot.png")
 
-def plot_histogram(readings, sensor_type):
+def plot_histogram(readings, sensor_type):#grafiek 2
     plt.figure()
     plt.hist(readings, bins=10, edgecolor="black", label="Readings")
     plt.title(f"Distribution of {sensor_type} readings")
@@ -88,7 +88,7 @@ def plot_histogram(readings, sensor_type):
     plt.legend()
     plt.savefig("readings_histogram.png")
 
-def save_readings(readings, filename):
+def save_readings(readings, filename):#readings opslaan in csv bestand
     try:
         with open(filename, "w", newline="") as file:
             writer = csv.writer(file)
@@ -99,7 +99,7 @@ def save_readings(readings, filename):
     except OSError as error:
         print(f"\nError: could not save {filename}: {error}")
 
-def ask_choice():
+def ask_choice():#user input vragen voor keuze tussen readings genereren of csv bestand laden
     print("\n1) Generate new readings")
     print("2) Load readings from a CSV file")
     while True:
@@ -108,7 +108,7 @@ def ask_choice():
             return choice
         print("Please enter 1 or 2.")
 
-def load_readings(filename):
+def load_readings(filename):#laden van readings uit csv bestand
     try:
         with open(filename, "r") as file:
             reader = csv.reader(file)
@@ -130,7 +130,7 @@ def load_readings(filename):
     print(f"Loaded {len(readings)} readings from {filename}")
     return np.array(readings)
 
-def main():
+def main():#main programmma
     print("=== Sensor Data Analysis Tool ===")
     choice = ask_choice()
 
@@ -172,6 +172,6 @@ def main():
     plt.show()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":#starten van het programma
     main()
 
